@@ -1,5 +1,8 @@
 # Software Engineering Homework 1 Backend
 
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=mythicalbadger_swe-hw1-backend&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=mythicalbadger_swe-hw1-backend)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=mythicalbadger_swe-hw1-backend&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=mythicalbadger_swe-hw1-backend)
+
 This is the backend component of a webapp that allows employees at a company to request leave days from HR.
 ## Setup
 ### Libraries
