@@ -1,4 +1,6 @@
 """Test the user endpoints."""
+import typing
+
 import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
@@ -22,7 +24,7 @@ def session_fixture() -> Session:
 
 
 @pytest.fixture(name="client")
-def client_fixture(session: Session) -> None:
+def client_fixture(session: Session) -> typing.Generator:
     """Override the get_session dependency to use the session fixture."""
 
     def get_session_override() -> Session:
@@ -40,10 +42,11 @@ def test_create_user(session: Session, client: TestClient) -> None:
     """Test that a user can be created."""
     username = "test"
     password = "password"
+    url = "/register"
     full_name = "test user"
 
     response = client.post(
-        "/register",
+        url=url,
         json={"username": username, "password": password, "full_name": full_name},
     )
     data = response.json()
@@ -62,14 +65,15 @@ def test_create_user_with_invalid_username(
     username = "test"
     password = "password"
     full_name = "test user"
+    url = "/register"
 
     client.post(
-        "/register",
+        url=url,
         json={"username": username, "password": password, "full_name": full_name},
     )
 
     response = client.post(
-        "/register",
+        url=url,
         json={"username": username, "password": password, "full_name": full_name},
     )
     data = response.json()
