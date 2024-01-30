@@ -36,7 +36,9 @@ jobs:
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
   test-and-coverage:
     runs-on: ubuntu-latest
-
+    defaults:
+      run:
+        working-directory: ./
     steps:
       - uses: actions/checkout@v4
         with:
@@ -73,7 +75,7 @@ jobs:
           retention-days: 7
 
   build-and-upload:
-    needs: [test-and-coverage]
+    needs: [ test-and-coverage ]
     if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     steps:
