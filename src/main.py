@@ -1,12 +1,12 @@
 """The main module of the application, run when the application is started."""
+from contextlib import asynccontextmanager
+
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from contextlib import asynccontextmanager
 
 import src.database as database
 from src.routers import leave_requests, users
-
 
 tags_metadata = [
     {
