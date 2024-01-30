@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 import src.database as database
-from src.routers import leave_requests, users
+from src.swe_hw1_backend.routers import leave_requests, users
 
 tags_metadata = [
     {

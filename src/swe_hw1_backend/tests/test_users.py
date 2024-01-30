@@ -9,8 +9,7 @@ from sqlmodel.pool import StaticPool
 
 from src.database import get_session
 from src.main import app
-
-from ..utils import hasher
+from src.swe_hw1_backend.utils import hasher
 
 
 @pytest.fixture(name="session")

@@ -1,8 +1,8 @@
 """Module containing user database logic."""
 from sqlmodel import select
 
-from ..models.users import User
-from ..services.base import BaseService
+from src.swe_hw1_backend.models.users import User
+from src.swe_hw1_backend.services.base import BaseService
 
 
 class UserService(BaseService):

@@ -4,8 +4,8 @@ import os
 from dotenv import load_dotenv
 from sqlmodel import Session, SQLModel, create_engine, select
 
-from src.models.users import User
-from src.utils import hasher
+from src.swe_hw1_backend.models.users import User
+from src.swe_hw1_backend.utils import hasher
 
 load_dotenv()
 

@@ -6,11 +6,10 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlmodel import Session
 
 from src.database import get_session
-
-from ..models.users import User
-from ..schemas.users import UserCreate
-from ..services.users import UserService
-from ..utils import hasher
+from src.swe_hw1_backend.models.users import User
+from src.swe_hw1_backend.schemas.users import UserCreate
+from src.swe_hw1_backend.services.users import UserService
+from src.swe_hw1_backend.utils import hasher
 
 router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
