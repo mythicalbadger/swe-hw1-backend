@@ -2,9 +2,11 @@
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
 
 import src.database as database
 from src.routers import leave_requests, users
+
 
 tags_metadata = [
     {
@@ -45,6 +47,12 @@ async def root() -> dict:
     :return: A simple JSON message.
     """
     return {"message": "Hello World"}
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> None:
+    """Startup event handler."""
+    database.init_db()
 
 
 if __name__ == "__main__":
