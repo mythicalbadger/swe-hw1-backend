@@ -23,11 +23,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install flake8
 
-      - name: Lint with isort
-        uses: isort/isort-action@master
-        with:
-          isortVersion: "5.13.2"
-
       - name: Lint with black
         uses: psf/black@stable
         with:
