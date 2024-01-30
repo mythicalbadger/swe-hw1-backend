@@ -6,8 +6,7 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlmodel import Session
 
 from src.database import get_session
-from src.swe_hw1_backend.models.leave_requests import (LeaveRequest,
-                                                       LeaveRequestStatus)
+from src.swe_hw1_backend.models.leave_requests import LeaveRequest, LeaveRequestStatus
 from src.swe_hw1_backend.models.users import User
 from src.swe_hw1_backend.routers.users import get_current_user
 from src.swe_hw1_backend.schemas.leave_requests import LeaveRequestCreate

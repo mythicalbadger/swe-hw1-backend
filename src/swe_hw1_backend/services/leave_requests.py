@@ -3,8 +3,7 @@ from typing import List
 
 from sqlmodel import select
 
-from src.swe_hw1_backend.models.leave_requests import (LeaveRequest,
-                                                       LeaveRequestStatus)
+from src.swe_hw1_backend.models.leave_requests import LeaveRequest, LeaveRequestStatus
 from src.swe_hw1_backend.services.base import BaseService
 
 
