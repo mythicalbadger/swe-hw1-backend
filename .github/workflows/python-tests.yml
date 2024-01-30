@@ -36,15 +36,8 @@ jobs:
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
   test-and-coverage:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./
     steps:
       - uses: actions/checkout@v4
-        with:
-          name: coverage-report
-          path: coverage.xml
-          retention-days: 7
 
       - name: Set up Python ${{ env.PYTHON_VERSION }}
         uses: actions/setup-python@v5
