@@ -23,7 +23,6 @@ origins = [
 
 
 app = FastAPI(openapi_tags=tags_metadata)
-database.init_db()
 
 app.add_middleware(
     CORSMiddleware,

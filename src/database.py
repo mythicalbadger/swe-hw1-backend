@@ -21,28 +21,21 @@ DATABASE_URL = (
 
 engine = create_engine(DATABASE_URL)
 
+SQLModel.metadata.create_all(engine)
 
-def init_db() -> None:
-    """
-    Initialize the database engine and creates the admin user.
+with Session(engine) as session:
+    query = select(User).where(User.username == "admin")
+    result = session.exec(query).one_or_none()
 
-    :return: None
-    """
-    SQLModel.metadata.create_all(engine)
-
-    with Session(engine) as session:
-        query = select(User).where(User.username == "admin")
-        result = session.exec(query).one_or_none()
-
-        if result is None:
-            admin = User(
-                username="admin",
-                hashed_password=hasher.hash("bigchungus"),
-                full_name="Admin Istrator",
-                is_admin=True,
-            )
-            session.add(admin)
-            session.commit()
+    if result is None:
+        admin = User(
+            username="admin",
+            hashed_password=hasher.hash("bigchungus"),
+            full_name="Admin Istrator",
+            is_admin=True,
+        )
+        session.add(admin)
+        session.commit()
 
 
 def get_session() -> Session:
