@@ -1,7 +1,8 @@
+"""Leave requests router."""
 from typing import Annotated, List
 
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from fastapi import APIRouter, Depends, status, HTTPException
 from sqlmodel import Session
 
 from src.database import get_session
@@ -27,7 +28,15 @@ async def create_leave_request(
     leave_request_info: LeaveRequestCreate,
     current_user: Annotated[User, Depends(get_current_user)],
     session: Session = Depends(get_session),
-):
+) -> LeaveRequest:
+    """
+    Create a leave request.
+
+    :param leave_request_info: The leave request info object.
+    :param current_user: Current user object.
+    :param session: Database session.
+    :return: A created leave request object.
+    """
     leave_request: LeaveRequest = LeaveRequest(
         requester_id=current_user.id,
         requester=current_user,
@@ -47,7 +56,14 @@ async def create_leave_request(
 async def get_all_leave_requests(
     current_user: Annotated[User, Depends(get_current_user)],
     session: Session = Depends(get_session),
-):
+) -> List[LeaveRequest]:
+    """
+    Get all leave requests.
+
+    :param current_user: The current user.
+    :param session: The database session.
+    :return: a list of all leave requests.
+    """
     leave_requests: List[LeaveRequest] = LeaveRequestService(
         session
     ).get_all_leave_requests()
@@ -59,7 +75,14 @@ async def delete_leave_request(
     leave_request_id: int,
     current_user: Annotated[User, Depends(get_current_user)],
     session: Session = Depends(get_session),
-):
+) -> None:
+    """
+    Delete a leave request.
+
+    :param leave_request_id: The id of the leave request to delete.
+    :param current_user: The current user.
+    :param session: The database session.
+    """
     leave_request: LeaveRequest = LeaveRequestService(session).get_leave_request_by_id(
         leave_request_id
     )
@@ -75,7 +98,14 @@ async def approve_leave_request(
     leave_request_id: int,
     current_user: Annotated[User, Depends(get_current_user)],
     session: Session = Depends(get_session),
-):
+) -> None:
+    """
+    Mark a leave request as approved.
+
+    :param leave_request_id: The id of the leave request to approve.
+    :param current_user: The current user.
+    :param session: The database session.
+    """
     if not current_user.is_admin:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -92,7 +122,14 @@ async def deny_leave_request(
     leave_request_id: int,
     current_user: Annotated[User, Depends(get_current_user)],
     session: Session = Depends(get_session),
-):
+) -> None:
+    """
+    Mark a leave request as denied.
+
+    :param leave_request_id: The id of the leave request to deny.
+    :param current_user: The current user.
+    :param session: The database session.
+    """
     if not current_user.is_admin:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

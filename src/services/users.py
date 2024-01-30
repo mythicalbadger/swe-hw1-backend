@@ -1,3 +1,4 @@
+"""Module containing user database logic."""
 from sqlmodel import select
 
 from src.models.users import User
@@ -5,9 +6,12 @@ from src.services.base import BaseService
 
 
 class UserService(BaseService):
-    def create_user(self, user: User) -> User:
+    """Database services for users."""
+
+    def create_user(self: "UserService", user: User) -> User:
         """
-        Inserts a new user into the database.
+        Insert a new user into the database.
+
         :param user: The user object containing the user information.
         """
         self.session.add(user)
@@ -16,9 +20,10 @@ class UserService(BaseService):
 
         return user
 
-    def get_user_by_username(self, username: str) -> User:
+    def get_user_by_username(self: "UserService", username: str) -> User:
         """
-        Queries the database for a user by their username.
+        Query the database for a user by their username.
+
         :param username: The username to query.
         :return: `User` corresponding to the username or `None` if no user with that
         username exists.
@@ -28,9 +33,12 @@ class UserService(BaseService):
 
         return result
 
-    def increment_remaining_leave_days(self, username: str, days: int) -> None:
+    def increment_remaining_leave_days(
+        self: "UserService", username: str, days: int
+    ) -> None:
         """
         Increment the specified amount of days to user's remaining leave days.
+
         :param username: The username of the user to query.
         :param days: The number of days to increment.
         """
@@ -39,9 +47,12 @@ class UserService(BaseService):
         self.session.add(user)
         self.session.commit()
 
-    def deduct_remaining_leave_days(self, username: str, days: int) -> None:
+    def deduct_remaining_leave_days(
+        self: "UserService", username: str, days: int
+    ) -> None:
         """
         Deducts the specified amount of days from user's remaining leave days.
+
         :param username: The username of the user to query.
         :param days: The number of days to deduct.
         """

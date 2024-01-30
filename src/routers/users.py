@@ -1,15 +1,15 @@
+"""Router for user endpoints."""
 from typing import Annotated
 
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlmodel import Session
 
-from src.services.users import UserService
-from src.utils import hasher
 from src.database import get_session
-from fastapi import APIRouter, Depends, HTTPException, status
-
 from src.models.users import User
 from src.schemas.users import UserCreate
+from src.services.users import UserService
+from src.utils import hasher
 
 router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -19,7 +19,14 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 async def get_current_user(
     token: Annotated[str, Depends(oauth2_scheme)],
     session: Session = Depends(get_session),
-):
+) -> User:
+    """
+    Get the current user.
+
+    :param token: The authentication token.
+    :param session: The database session.
+    :return: The current user object.
+    """
     user = UserService(session).get_user_by_username(username=token)
     if not user:
         raise HTTPException(
@@ -36,7 +43,16 @@ async def get_current_user(
     status_code=status.HTTP_201_CREATED,
     response_model=User,
 )
-async def register(user_info: UserCreate, session: Session = Depends(get_session)):
+async def register(
+    user_info: UserCreate, session: Session = Depends(get_session)
+) -> User:
+    """
+    Register a new user.
+
+    :param user_info: User info object.
+    :param session: Database session.
+    :return: The created user object.
+    """
     if (
         UserService(session).get_user_by_username(username=user_info.username)
         is not None
@@ -59,7 +75,14 @@ async def register(user_info: UserCreate, session: Session = Depends(get_session
 async def login(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     session: Session = Depends(get_session),
-):
+) -> dict:
+    """
+    Log in a user.
+
+    :param form_data: The form data containing the username and password.
+    :param session: The database session.
+    :return: The authentication token.
+    """
     user: User = UserService(session).get_user_by_username(username=form_data.username)
     if not user or not hasher.verify(form_data.password, user.hashed_password):
         raise HTTPException(

@@ -1,9 +1,11 @@
+"""A utility module containing password hashing functions."""
 import bcrypt
 
 
 def hash(password: str) -> bytes:
     """
-    Hashes a password.
+    Hash a password.
+
     :param password: The password to hash.
     :return: The hashed password.
     """
@@ -12,7 +14,8 @@ def hash(password: str) -> bytes:
 
 def verify(password: str, hashed_password: bytes) -> bool:
     """
-    Checks a password against a hashed password.
+    Check a password against a hashed password.
+
     :param password: The plaintext password.
     :param hashed_password: The hashed password.
     :return: True if passwords match, False otherwise.

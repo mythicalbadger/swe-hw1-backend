@@ -1,10 +1,12 @@
+"""Base class for application services."""
 from sqlmodel import Session
 
 
 class SessionMixin:
-    """Provides instance of database session."""
+    """Provide instance of database session."""
 
-    def __init__(self, session: Session) -> None:
+    def __init__(self: "SessionMixin", session: Session) -> None:
+        """Initialize the session."""
         self.session = session
 
 

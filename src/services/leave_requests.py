@@ -1,3 +1,4 @@
+"""This module contains services for leave requests."""
 from typing import List
 
 from sqlmodel import select
@@ -7,19 +8,25 @@ from src.services.base import BaseService
 
 
 class LeaveRequestService(BaseService):
-    def create_leave_request(self, leave_request: LeaveRequest) -> None:
+    """Database services for leave requests."""
+
+    def create_leave_request(
+        self: "LeaveRequestService", leave_request: LeaveRequest
+    ) -> None:
         """
-        Inserts a new leave request into the database.
-        :param leave_request: The leave request object containing the user information.
+        Insert a new leave request into the database.
+
+        :param leave_request: The leave request object containing user information.
         """
         self.session.add(leave_request)
         self.session.commit()
 
     def get_leave_requests_by_requester_id(
-        self, requester_id: int
+        self: "LeaveRequestService", requester_id: int
     ) -> List[LeaveRequest]:
         """
-        Gets all leave requests for user with the given id.
+        Get all leave requests for user with the given id.
+
         :param requester_id: The id of the user to get the leave requests for.
         :return: A list of leave requests for the given id.
         """
@@ -28,9 +35,10 @@ class LeaveRequestService(BaseService):
 
         return result
 
-    def get_leave_request_by_id(self, id: int) -> LeaveRequest:
+    def get_leave_request_by_id(self: "LeaveRequestService", id: int) -> LeaveRequest:
         """
-        Gets a leave request with the given id.
+        Get a leave request with the given id.
+
         :param id: The id of the leave request to query.
         :return: The leave request with given id.
         """
@@ -39,9 +47,10 @@ class LeaveRequestService(BaseService):
 
         return result
 
-    def get_all_leave_requests(self) -> List[LeaveRequest]:
+    def get_all_leave_requests(self: "LeaveRequestService") -> List[LeaveRequest]:
         """
-        Fetches all leave requests created.
+        Fetch all leave requests created.
+
         :return: A list of all leave requests ordered by start date.
         """
         query = select(LeaveRequest)
@@ -49,9 +58,12 @@ class LeaveRequestService(BaseService):
 
         return result
 
-    def delete_leave_request(self, leave_request_id: int) -> None:
+    def delete_leave_request(
+        self: "LeaveRequestService", leave_request_id: int
+    ) -> None:
         """
-        Deletes a leave request.
+        Delete a leave request.
+
         :param leave_request_id: The id of the leave request to delete.
         """
         leave_request = self.get_leave_request_by_id(leave_request_id)
@@ -59,10 +71,11 @@ class LeaveRequestService(BaseService):
         self.session.commit()
 
     def set_leave_request_status(
-        self, leave_request_id: int, status: LeaveRequestStatus
+        self: "LeaveRequestService", leave_request_id: int, status: LeaveRequestStatus
     ) -> None:
         """
-        Sets the status of a leave request.
+        Set the status of a leave request.
+
         :param leave_request_id: The id of the leave request to set.
         :param status: The status to set.
         """

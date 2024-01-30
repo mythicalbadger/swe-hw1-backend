@@ -3,7 +3,7 @@
 This is the backend component of a webapp that allows employees at a company to request leave days from HR.
 ## Setup
 ### Libraries
-The backend was built using Tiangolo's [FastAPI](https://fastapi.tiangolo.com/) and [SQLModel](https://sqlmodel.tiangolo.com/). 
+The backend was built using Tiangolo's [FastAPI](https://fastapi.tiangolo.com/) and [SQLModel](https://sqlmodel.tiangolo.com/).
 ### Dependencies
 I'm using Python version `3.12.0`. Dependencies can be found in `pyproject.toml`. Using [Poetry](https://python-poetry.org/), one can simply run
 ```shell

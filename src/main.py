@@ -1,8 +1,10 @@
+"""The main module of the application, run when the application is started."""
 import uvicorn
-import src.database as database
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from src.routers import users, leave_requests
+
+import src.database as database
+from src.routers import leave_requests, users
 
 tags_metadata = [
     {
@@ -37,7 +39,12 @@ app.include_router(leave_requests.router)
 
 
 @app.get("/")
-async def root():
+async def root() -> dict:
+    """
+    Return a simple JSON message. Default route.
+
+    :return: A simple JSON message.
+    """
     return {"message": "Hello World"}
 
 

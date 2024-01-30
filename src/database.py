@@ -1,7 +1,8 @@
+"""This module contains the database connection logic."""
 import os
 
-from sqlmodel import SQLModel, Session, create_engine, select
 from dotenv import load_dotenv
+from sqlmodel import Session, SQLModel, create_engine, select
 
 from src.models.users import User
 from src.utils import hasher
@@ -21,7 +22,12 @@ DATABASE_URL = (
 engine = create_engine(DATABASE_URL)
 
 
-def init_db():
+def init_db() -> None:
+    """
+    Initialize the database engine and creates the admin user.
+
+    :return: None
+    """
     SQLModel.metadata.create_all(engine)
 
     with Session(engine) as session:
@@ -39,6 +45,11 @@ def init_db():
             session.commit()
 
 
-def get_session():
+def get_session() -> Session:
+    """
+    Get a database session.
+
+    :return: database session.
+    """
     with Session(engine) as session:
         yield session

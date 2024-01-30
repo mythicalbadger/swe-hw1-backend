@@ -1,16 +1,18 @@
+"""Test the user endpoints."""
 import pytest
-import src.utils.hasher as hasher
 from fastapi import status
 from fastapi.testclient import TestClient
 from sqlmodel import Session, SQLModel, create_engine
 from sqlmodel.pool import StaticPool
 
+import src.utils.hasher as hasher
 from src.database import get_session
 from src.main import app
 
 
 @pytest.fixture(name="session")
-def session_fixture():
+def session_fixture() -> Session:
+    """Create a new database session for each test."""
     engine = create_engine(
         "sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool
     )
@@ -20,8 +22,11 @@ def session_fixture():
 
 
 @pytest.fixture(name="client")
-def client_fixture(session: Session):
-    def get_session_override():
+def client_fixture(session: Session) -> None:
+    """Override the get_session dependency to use the session fixture."""
+
+    def get_session_override() -> Session:
+        """Return the session fixture."""
         return session
 
     app.dependency_overrides[get_session] = get_session_override
@@ -31,7 +36,8 @@ def client_fixture(session: Session):
     app.dependency_overrides.clear()
 
 
-def test_create_user(session: Session, client: TestClient):
+def test_create_user(session: Session, client: TestClient) -> None:
+    """Test that a user can be created."""
     username = "test"
     password = "password"
     full_name = "test user"
@@ -49,12 +55,15 @@ def test_create_user(session: Session, client: TestClient):
     assert data["remaining_leave_days"] == 42
 
 
-def test_create_user_with_invalid_username(session: Session, client: TestClient):
+def test_create_user_with_invalid_username(
+    session: Session, client: TestClient
+) -> None:
+    """Test that a user cannot be created with an invalid username."""
     username = "test"
     password = "password"
     full_name = "test user"
 
-    response = client.post(
+    client.post(
         "/register",
         json={"username": username, "password": password, "full_name": full_name},
     )
@@ -69,7 +78,8 @@ def test_create_user_with_invalid_username(session: Session, client: TestClient)
     assert data["detail"] == "Username already taken."
 
 
-def test_login_user(session: Session, client: TestClient):
+def test_login_user(session: Session, client: TestClient) -> None:
+    """Test that a user can log in."""
     username = "test"
     password = "password"
 
