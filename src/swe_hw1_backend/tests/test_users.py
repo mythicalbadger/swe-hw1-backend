@@ -6,19 +6,19 @@ from sqlmodel import Session
 
 from src.swe_hw1_backend.models.users import User
 from src.swe_hw1_backend.utils import hasher
+from swe_hw1_backend.tests.conftest import ApiEndpoint
 
 fake = Faker()
-username = fake.user_name()
-password = fake.password()
-full_name = fake.name()
 
 
 def test_create_user(session: Session, client: TestClient) -> None:
     """Test that a user can be created."""
-    url = "/register"
+    username = fake.user_name()
+    password = fake.password()
+    full_name = fake.name()
 
     response = client.post(
-        url=url,
+        url=ApiEndpoint.register.value,
         json={"username": username, "password": password, "full_name": full_name},
     )
     data = response.json()
@@ -31,23 +31,16 @@ def test_create_user(session: Session, client: TestClient) -> None:
 
 
 def test_create_user_with_invalid_username(
-    session: Session, client: TestClient
+    session: Session, client: TestClient, user_fixture: User
 ) -> None:
     """Test that a user cannot be created with an invalid username."""
-    url = "/register"
-
-    user = User(
-        username=username,
-        hashed_password=hasher.hash(password),
-        full_name=full_name,
-        remaining_leave_days=42,
-    )
-    session.add(user)
-    session.commit()
-
     response = client.post(
-        url=url,
-        json={"username": username, "password": password, "full_name": full_name},
+        url=ApiEndpoint.register.value,
+        json={
+            "username": user_fixture.username,
+            "password": user_fixture.username,
+            "full_name": user_fixture.full_name,
+        },
     )
     data = response.json()
 
@@ -55,23 +48,18 @@ def test_create_user_with_invalid_username(
     assert data["detail"] == "Username already taken."
 
 
-def test_login_user(session: Session, client: TestClient) -> None:
+def test_login_user(session: Session, client: TestClient, user_fixture: User) -> None:
     """Test that a user can log in."""
-    user = User(
-        username=username,
-        hashed_password=hasher.hash(password),
-        full_name=full_name,
-        remaining_leave_days=42,
-    )
-    session.add(user)
-    session.commit()
-
     response = client.post(
         "/token",
-        data={"username": username, "password": password, "grant_type": "password"},
+        data={
+            "username": user_fixture.username,
+            "password": "password",
+            "grant_type": "password",
+        },
         headers={"content-type": "application/x-www-form-urlencoded"},
     )
     data = response.json()
     assert response.status_code == status.HTTP_200_OK
     assert data["token_type"] == "bearer"
-    assert data["access_token"] == username
+    assert data["access_token"] == user_fixture.username
