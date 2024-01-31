@@ -1,34 +1,35 @@
 """Test the leave request endpoints."""
 import datetime
-import typing
 
-import pytest
 from faker import Faker
 from fastapi import status
 from fastapi.testclient import TestClient
-from sqlmodel import Session, SQLModel, create_engine, select
-from sqlmodel.pool import StaticPool
+from sqlmodel import Session, select
 
-from src.database import get_session
-from src.main import app
 from src.swe_hw1_backend.models.leave_requests import LeaveRequest
 from src.swe_hw1_backend.models.users import User
 from src.swe_hw1_backend.utils import hasher
 
 fake = Faker()
+admin_username = "admin"
 start_date = datetime.datetime.today()
 end_date = start_date + datetime.timedelta(days=1)
 reason = "I want to go to the moon."  # from copilot... it has dreams
 
 
 def create_user(
-    user_username: str, user_password: str, user_full_name: str, session: Session
+    user_username: str,
+    user_password: str,
+    user_full_name: str,
+    session: Session,
+    is_admin: bool = False,
 ) -> User:
     """Create a user."""
     user = User(
         username=user_username,
         full_name=user_full_name,
         hashed_password=hasher.hash(user_password),
+        is_admin=is_admin,
     )
     session.add(user)
     session.commit()
@@ -57,32 +58,6 @@ def create_leave_request(
     session.refresh(leave_request)
 
     return leave_request
-
-
-@pytest.fixture(name="session")
-def session_fixture() -> Session:
-    """Create a new database session for each test."""
-    engine = create_engine(
-        "sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool
-    )
-    SQLModel.metadata.create_all(engine)
-    with Session(engine) as session:
-        yield session
-
-
-@pytest.fixture(name="client")
-def client_fixture(session: Session) -> typing.Generator:
-    """Override the get_session dependency to use the session fixture."""
-
-    def get_session_override() -> Session:
-        """Return the session fixture."""
-        return session
-
-    app.dependency_overrides[get_session] = get_session_override
-
-    client = TestClient(app)
-    yield client
-    app.dependency_overrides.clear()
 
 
 def test_create_leave_request(session: Session, client: TestClient) -> None:
@@ -177,3 +152,77 @@ def test_delete_leave_request(session: Session, client: TestClient) -> None:
 
     leave_requests = session.exec(select(LeaveRequest)).all()
     assert len(leave_requests) == 0
+
+
+def test_approve_leave_request(session: Session, client: TestClient) -> None:
+    """Test that a leave request can be approved."""
+    url = "/api/approve-leave-request/1"
+
+    user = create_user(
+        user_username=fake.user_name(),
+        user_password=fake.password(),
+        user_full_name=fake.name(),
+        session=session,
+        is_admin=True,
+    )
+    leave_request = create_leave_request(
+        user=user,
+        leave_request_start_date=start_date,
+        leave_request_end_date=end_date,
+        leave_request_reason=reason,
+        session=session,
+    )
+
+    response = client.put(url=url, headers={"Authorization": f"Bearer {user.username}"})
+    assert response.status_code == status.HTTP_200_OK
+
+    fetched_leave_request = session.get(LeaveRequest, leave_request.id)
+    assert fetched_leave_request.status == "approved"
+
+
+def test_deny_leave_request(session: Session, client: TestClient) -> None:
+    """Test that a leave request can be denied."""
+    url = "/api/deny-leave-request/1"
+
+    user = create_user(
+        user_username=fake.user_name(),
+        user_password=fake.password(),
+        user_full_name=fake.name(),
+        session=session,
+        is_admin=True,
+    )
+    leave_request = create_leave_request(
+        user=user,
+        leave_request_start_date=start_date,
+        leave_request_end_date=end_date,
+        leave_request_reason=reason,
+        session=session,
+    )
+
+    response = client.put(url=url, headers={"Authorization": f"Bearer {user.username}"})
+    assert response.status_code == status.HTTP_200_OK
+
+    fetched_leave_request = session.get(LeaveRequest, leave_request.id)
+    assert fetched_leave_request.status == "denied"
+
+
+def test_deny_leave_request_if_not_admin(session: Session, client: TestClient) -> None:
+    """Test that a leave request can be denied."""
+    url = "/api/deny-leave-request/1"
+
+    user = create_user(
+        user_username=fake.user_name(),
+        user_password=fake.password(),
+        user_full_name=fake.name(),
+        session=session,
+    )
+    create_leave_request(
+        user=user,
+        leave_request_start_date=start_date,
+        leave_request_end_date=end_date,
+        leave_request_reason=reason,
+        session=session,
+    )
+
+    response = client.put(url=url, headers={"Authorization": f"Bearer {user.username}"})
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED

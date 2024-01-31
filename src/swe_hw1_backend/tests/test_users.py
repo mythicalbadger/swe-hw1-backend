@@ -1,15 +1,9 @@
 """Test the user endpoints."""
-import typing
-
-import pytest
 from faker import Faker
 from fastapi import status
 from fastapi.testclient import TestClient
-from sqlmodel import Session, SQLModel, create_engine
-from sqlmodel.pool import StaticPool
+from sqlmodel import Session
 
-from src.database import get_session
-from src.main import app
 from src.swe_hw1_backend.models.users import User
 from src.swe_hw1_backend.utils import hasher
 
@@ -17,32 +11,6 @@ fake = Faker()
 username = fake.user_name()
 password = fake.password()
 full_name = fake.name()
-
-
-@pytest.fixture(name="session")
-def session_fixture() -> Session:
-    """Create a new database session for each test."""
-    engine = create_engine(
-        "sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool
-    )
-    SQLModel.metadata.create_all(engine)
-    with Session(engine) as session:
-        yield session
-
-
-@pytest.fixture(name="client")
-def client_fixture(session: Session) -> typing.Generator:
-    """Override the get_session dependency to use the session fixture."""
-
-    def get_session_override() -> Session:
-        """Return the session fixture."""
-        return session
-
-    app.dependency_overrides[get_session] = get_session_override
-
-    client = TestClient(app)
-    yield client
-    app.dependency_overrides.clear()
 
 
 def test_create_user(session: Session, client: TestClient) -> None:
