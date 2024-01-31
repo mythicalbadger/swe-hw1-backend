@@ -16,12 +16,45 @@ from src.swe_hw1_backend.models.users import User
 from src.swe_hw1_backend.utils import hasher
 
 fake = Faker()
-username = fake.user_name()
-password = fake.password()
-full_name = fake.name()
 start_date = datetime.datetime.today()
 end_date = start_date + datetime.timedelta(days=1)
 reason = "I want to go to the moon."  # from copilot... it has dreams
+
+
+def create_user(user_username: str, user_password: str, user_full_name: str, session: Session) -> User:
+    """Create a user."""
+    user = User(
+        username=user_username,
+        full_name=user_full_name,
+        hashed_password=hasher.hash(user_password),
+    )
+    session.add(user)
+    session.commit()
+    session.refresh(user)
+
+    return user
+
+
+def create_leave_request(
+        user: User,
+        leave_request_start_date: datetime.datetime,
+        leave_request_end_date: datetime.datetime,
+        leave_request_reason: str,
+        session: Session,
+) -> LeaveRequest:
+    """Create a leave request."""
+    leave_request = LeaveRequest(
+        requester_id=user.id,
+        requester=user,
+        start_date=leave_request_start_date,
+        end_date=leave_request_end_date,
+        reason=leave_request_reason,
+    )
+    session.add(leave_request)
+    session.commit()
+    session.refresh(leave_request)
+
+    return leave_request
 
 
 @pytest.fixture(name="session")
@@ -54,13 +87,12 @@ def test_create_leave_request(session: Session, client: TestClient) -> None:
     """Test that a leave request can be created."""
     url = "/api/create-leave-request"
 
-    user = User(
-        username=username,
-        full_name=full_name,
-        hashed_password=hasher.hash(password),
+    user = create_user(
+        user_username=fake.user_name(),
+        user_password=fake.password(),
+        user_full_name=fake.name(),
+        session=session,
     )
-    session.add(user)
-    session.commit()
 
     response = client.post(
         url=url,
@@ -85,25 +117,19 @@ def test_get_all_leave_requests(session: Session, client: TestClient) -> None:
     """Test that all leave requests can be fetched."""
     url = "/api/get-all-leave-requests"
 
-    user = User(
-        username=username,
-        full_name=full_name,
-        hashed_password=hasher.hash(password),
+    user = create_user(
+        user_username=fake.user_name(),
+        user_password=fake.password(),
+        user_full_name=fake.name(),
+        session=session
     )
-    session.add(user)
-    session.commit()
-    session.refresh(user)
-
-    leave_request = LeaveRequest(
-        requester_id=user.id,
-        requester=user,
-        start_date=start_date,
-        end_date=end_date,
-        reason=reason,
+    leave_request = create_leave_request(
+        user=user,
+        leave_request_start_date=start_date,
+        leave_request_end_date=end_date,
+        leave_request_reason=reason,
+        session=session
     )
-
-    session.add(leave_request)
-    session.commit()
 
     response = client.get(url=url, headers={"Authorization": f"Bearer {user.username}"})
 
@@ -114,11 +140,11 @@ def test_get_all_leave_requests(session: Session, client: TestClient) -> None:
     assert fetched_leave_request["id"] == leave_request.id
     assert fetched_leave_request["requester_id"] == user.id
     assert (
-        datetime.datetime.fromisoformat(fetched_leave_request["start_date"])
-        == start_date
+            datetime.datetime.fromisoformat(fetched_leave_request["start_date"])
+            == start_date
     )
     assert (
-        datetime.datetime.fromisoformat(fetched_leave_request["end_date"]) == end_date
+            datetime.datetime.fromisoformat(fetched_leave_request["end_date"]) == end_date
     )
     assert fetched_leave_request["reason"] == reason
     assert fetched_leave_request["status"] == "pending"
@@ -128,28 +154,19 @@ def test_delete_leave_request(session: Session, client: TestClient) -> None:
     """Test that a leave request can be deleted."""
     url = "/api/delete-leave-request/1"
 
-    user = User(
-        username=username,
-        full_name=full_name,
-        hashed_password=hasher.hash(password),
+    user = create_user(
+        user_username=fake.user_name(),
+        user_password=fake.password(),
+        user_full_name=fake.name(),
+        session=session
     )
-
-    session.add(user)
-    session.commit()
-
-    session.refresh(user)
-
-    leave_request = LeaveRequest(
-        requester_id=user.id,
-        requester=user,
-        start_date=start_date,
-        end_date=end_date,
-        reason=reason,
+    create_leave_request(
+        user=user,
+        leave_request_start_date=start_date,
+        leave_request_end_date=end_date,
+        leave_request_reason=reason,
+        session=session
     )
-
-    session.add(leave_request)
-    session.add(user)
-    session.commit()
 
     response = client.delete(
         url=url, headers={"Authorization": f"Bearer {user.username}"}
