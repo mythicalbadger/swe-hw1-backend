@@ -99,6 +99,7 @@ def leave_request_fixture(session: Session, user_fixture: User) -> LeaveRequest:
 class ApiEndpoint(enum.Enum):
     """Enum for API endpoints."""
 
+    get_current_user = "/api/get-current-user"
     register = "/register"
     login = "/token"
     create_leave_request = "/api/create-leave-request"

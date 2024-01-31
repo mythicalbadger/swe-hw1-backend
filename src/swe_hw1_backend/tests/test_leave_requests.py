@@ -138,3 +138,14 @@ def test_deny_leave_request_if_not_admin(
         url=url, headers={"Authorization": f"Bearer {user_fixture.username}"}
     )
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+def test_approve_leave_request_if_not_admin(
+    session: Session, client: TestClient, user_fixture: User
+) -> None:
+    """Test that a leave request cannot be approved if user is not admin."""
+    url = f"{ApiEndpoint.approve_leave_request.value}/1"
+    response = client.put(
+        url=url, headers={"Authorization": f"Bearer {user_fixture.username}"}
+    )
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED

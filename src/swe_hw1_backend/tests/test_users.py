@@ -51,7 +51,7 @@ def test_create_user_with_invalid_username(
 def test_login_user(session: Session, client: TestClient, user_fixture: User) -> None:
     """Test that a user can log in."""
     response = client.post(
-        "/token",
+        url=ApiEndpoint.login.value,
         data={
             "username": user_fixture.username,
             "password": "password",
@@ -63,3 +63,39 @@ def test_login_user(session: Session, client: TestClient, user_fixture: User) ->
     assert response.status_code == status.HTTP_200_OK
     assert data["token_type"] == "bearer"
     assert data["access_token"] == user_fixture.username
+
+
+def test_login_user_with_invalid_credentials(
+    session: Session, client: TestClient, user_fixture: User
+) -> None:
+    """Test that a user cannot log in with invalid credentials."""
+    response = client.post(
+        url=ApiEndpoint.login.value,
+        data={
+            "username": user_fixture.username,
+            "password": "wrong_password",
+            "grant_type": "password",
+        },
+        headers={"content-type": "application/x-www-form-urlencoded"},
+    )
+    data = response.json()
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    assert data["detail"] == "Incorrect username or password."
+
+
+def test_get_current_user(
+    session: Session, client: TestClient, user_fixture: User
+) -> None:
+    """Test that the current user can be fetched."""
+    response = client.get(
+        url=ApiEndpoint.get_current_user.value,
+        headers={"Authorization": f"Bearer {user_fixture.username}"},
+    )
+    data = response.json()
+
+    assert response.status_code == status.HTTP_200_OK
+    assert data["id"] == user_fixture.id
+    assert data["full_name"] == user_fixture.full_name
+    assert data["username"] == user_fixture.username
+    assert data["remaining_leave_days"] == user_fixture.remaining_leave_days
+    assert data["is_admin"] == user_fixture.is_admin
