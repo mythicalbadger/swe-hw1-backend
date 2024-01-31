@@ -39,16 +39,6 @@ app.include_router(users.router)
 app.include_router(leave_requests.router)
 
 
-@app.get("/")
-async def root() -> dict:
-    """
-    Return a simple JSON message. Default route.
-
-    :return: A simple JSON message.
-    """
-    return {"message": "Hello World"}
-
-
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> None:
     """Startup event handler."""
