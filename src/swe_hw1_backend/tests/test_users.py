@@ -2,6 +2,7 @@
 import typing
 
 import pytest
+from faker import Faker
 from fastapi import status
 from fastapi.testclient import TestClient
 from sqlmodel import Session, SQLModel, create_engine
@@ -9,12 +10,13 @@ from sqlmodel.pool import StaticPool
 
 from src.database import get_session
 from src.main import app
+from src.swe_hw1_backend.models.users import User
 from src.swe_hw1_backend.utils import hasher
-from swe_hw1_backend.models.users import User
 
-username = "test"
-password = "password"
-full_name = "test user"
+fake = Faker()
+username = fake.user_name()
+password = fake.password()
+full_name = fake.name()
 
 
 @pytest.fixture(name="session")
@@ -61,15 +63,19 @@ def test_create_user(session: Session, client: TestClient) -> None:
 
 
 def test_create_user_with_invalid_username(
-    session: Session, client: TestClient
+        session: Session, client: TestClient
 ) -> None:
     """Test that a user cannot be created with an invalid username."""
     url = "/register"
 
-    client.post(
-        url=url,
-        json={"username": username, "password": password, "full_name": full_name},
+    user = User(
+        username=username,
+        hashed_password=hasher.hash(password),
+        full_name=full_name,
+        remaining_leave_days=42,
     )
+    session.add(user)
+    session.commit()
 
     response = client.post(
         url=url,
@@ -84,12 +90,11 @@ def test_create_user_with_invalid_username(
 def test_login_user(session: Session, client: TestClient) -> None:
     """Test that a user can log in."""
     user = User(
-        full_name=full_name,
         username=username,
         hashed_password=hasher.hash(password),
+        full_name=full_name,
         remaining_leave_days=42,
     )
-
     session.add(user)
     session.commit()
 
