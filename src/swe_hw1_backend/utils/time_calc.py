@@ -11,3 +11,8 @@ def days_between(start_date: datetime, end_date: datetime) -> int:
     :return:
     """
     return (end_date - start_date).days + 1
+
+
+def date_from_iso_format(date: str) -> datetime:
+    """Convert an ISO formatted date string to a datetime object."""
+    return datetime.fromisoformat(date)
