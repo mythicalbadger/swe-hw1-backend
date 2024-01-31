@@ -2,6 +2,14 @@
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=mythicalbadger_swe-hw1-backend&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=mythicalbadger_swe-hw1-backend)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=mythicalbadger_swe-hw1-backend&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=mythicalbadger_swe-hw1-backend)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=mythicalbadger_swe-hw1-backend&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=mythicalbadger_swe-hw1-backend)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=mythicalbadger_swe-hw1-backend&metric=coverage)](https://sonarcloud.io/summary/new_code?id=mythicalbadger_swe-hw1-backend)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=mythicalbadger_swe-hw1-backend&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=mythicalbadger_swe-hw1-backend)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=mythicalbadger_swe-hw1-backend&metric=bugs)](https://sonarcloud.io/summary/new_code?id=mythicalbadger_swe-hw1-backend)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=mythicalbadger_swe-hw1-backend&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=mythicalbadger_swe-hw1-backend)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=mythicalbadger_swe-hw1-backend&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=mythicalbadger_swe-hw1-backend)
+[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=mythicalbadger_swe-hw1-backend&metric=sqale_index)](https://sonarcloud.io/summary/new_code?id=mythicalbadger_swe-hw1-backend)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=mythicalbadger_swe-hw1-backend&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=mythicalbadger_swe-hw1-backend)
 
 This is the backend component of a webapp that allows employees at a company to request leave days from HR.
 ## Setup
