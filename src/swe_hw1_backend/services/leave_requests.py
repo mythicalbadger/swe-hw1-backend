@@ -1,4 +1,5 @@
 """This module contains services for leave requests."""
+import datetime
 from typing import List
 
 from sqlmodel import select
@@ -83,3 +84,21 @@ class LeaveRequestService(BaseService):
         leave_request.status = status
         self.session.add(leave_request)
         self.session.commit()
+
+    def is_date_in_leave_requests(
+        self: "LeaveRequestService",
+        date: datetime.datetime,
+        requester_id: int,
+    ) -> bool:
+        """
+        Check user's leave requests contains a date.
+
+        :param requester_id: The id of the user to check.
+        :param date: The date to check.
+        :return: True if the date is in a leave request, False otherwise.
+        """
+        leave_requests = self.get_leave_requests_by_requester_id(requester_id)
+        for leave_request in leave_requests:
+            if leave_request.start_date <= date <= leave_request.end_date:
+                return True
+        return False

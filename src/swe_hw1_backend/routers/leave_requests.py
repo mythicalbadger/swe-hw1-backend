@@ -1,4 +1,5 @@
 """Leave requests router."""
+import datetime
 from typing import Annotated, List
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -12,7 +13,7 @@ from src.swe_hw1_backend.routers.users import get_current_user
 from src.swe_hw1_backend.schemas.leave_requests import LeaveRequestCreate
 from src.swe_hw1_backend.services.leave_requests import LeaveRequestService
 from src.swe_hw1_backend.services.users import UserService
-from src.swe_hw1_backend.utils.time_calc import days_between
+from src.swe_hw1_backend.utils.time_calc import days_between, is_two_months_in_advance
 
 router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -42,9 +43,29 @@ async def create_leave_request(
         requester=current_user,
         **leave_request_info.model_dump()
     )
-    LeaveRequestService(session).create_leave_request(leave_request=leave_request)
-
     days_requested: int = days_between(leave_request.start_date, leave_request.end_date)
+
+    print(days_requested)
+
+    if not is_two_months_in_advance(leave_request.start_date):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Leave request must be made at least two months in advance.",
+        )
+    elif days_requested > current_user.remaining_leave_days:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Not enough remaining leave days.",
+        )
+    elif LeaveRequestService(session).is_date_in_leave_requests(
+        leave_request.start_date, current_user.id
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Leave request overlaps with another leave request.",
+        )
+
+    LeaveRequestService(session).create_leave_request(leave_request=leave_request)
     UserService(session).deduct_remaining_leave_days(
         username=current_user.username, days=days_requested
     )
@@ -86,6 +107,13 @@ async def delete_leave_request(
     leave_request: LeaveRequest = LeaveRequestService(session).get_leave_request_by_id(
         leave_request_id
     )
+
+    if leave_request.start_date < datetime.datetime.today():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot delete leave request after leave has started.",
+        )
+
     leave_days: int = days_between(leave_request.start_date, leave_request.end_date)
     UserService(session).increment_remaining_leave_days(
         current_user.username, leave_days

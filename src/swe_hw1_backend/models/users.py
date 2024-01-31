@@ -11,5 +11,5 @@ class User(SQLModel, table=True):
     full_name: str
     username: str = Field(index=True)
     hashed_password: bytes
-    remaining_leave_days: int = Field(default=42)
+    remaining_leave_days: int = Field(default=10)
     is_admin: bool = Field(default=False)
