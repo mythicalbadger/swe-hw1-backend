@@ -69,8 +69,7 @@ def test_create_leave_request(session: Session, client: TestClient) -> None:
             "end_date": str(end_date),
             "reason": reason,
         },
-        headers={"Authorization": f"Bearer {user.username}"}
-
+        headers={"Authorization": f"Bearer {user.username}"},
     )
     data = response.json()
 
@@ -106,10 +105,7 @@ def test_get_all_leave_requests(session: Session, client: TestClient) -> None:
     session.add(leave_request)
     session.commit()
 
-    response = client.get(
-        url=url,
-        headers={"Authorization": f"Bearer {user.username}"}
-    )
+    response = client.get(url=url, headers={"Authorization": f"Bearer {user.username}"})
 
     data = response.json()
     fetched_leave_request = data[0]
@@ -117,8 +113,13 @@ def test_get_all_leave_requests(session: Session, client: TestClient) -> None:
     assert response.status_code == status.HTTP_200_OK
     assert fetched_leave_request["id"] == leave_request.id
     assert fetched_leave_request["requester_id"] == user.id
-    assert datetime.datetime.fromisoformat(fetched_leave_request["start_date"]) == start_date
-    assert datetime.datetime.fromisoformat(fetched_leave_request["end_date"]) == end_date
+    assert (
+        datetime.datetime.fromisoformat(fetched_leave_request["start_date"])
+        == start_date
+    )
+    assert (
+        datetime.datetime.fromisoformat(fetched_leave_request["end_date"]) == end_date
+    )
     assert fetched_leave_request["reason"] == reason
     assert fetched_leave_request["status"] == "pending"
 
@@ -151,8 +152,7 @@ def test_delete_leave_request(session: Session, client: TestClient) -> None:
     session.commit()
 
     response = client.delete(
-        url=url,
-        headers={"Authorization": f"Bearer {user.username}"}
+        url=url, headers={"Authorization": f"Bearer {user.username}"}
     )
     assert response.status_code == status.HTTP_200_OK
 

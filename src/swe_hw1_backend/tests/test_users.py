@@ -63,7 +63,7 @@ def test_create_user(session: Session, client: TestClient) -> None:
 
 
 def test_create_user_with_invalid_username(
-        session: Session, client: TestClient
+    session: Session, client: TestClient
 ) -> None:
     """Test that a user cannot be created with an invalid username."""
     url = "/register"
